@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+    <head>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script> 
+        <link rel="stylesheet" type="text/css" href="{{ url_for('static',filename='styles.css') }}">
+    </head>
+
+    <div class="search">
+        <input type="search" class="search-box" />
+        <span class="search-button">
+            <span class="search-icon"></span>
+        </span>
+    </div>
+
+    <script>
+        $('.search-button').click(function () {
+            $(this).parent().toggleClass('open');
+        });
+    </script>
+</html>
