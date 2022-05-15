@@ -22,12 +22,16 @@ class QuerySuggestions:
 
     def rank_candidates(self, candidates: dict)-> dict:
         total_sessions = sum(candidates.values())
+        print('candidates.items()', candidates.items()) 
         score_dict = dict(map(lambda x: (x[0], self.calc_score(x[1], total_sessions)), candidates.items()))
         print('score_dict', score_dict)
         score_dict_sorted = sorted(score_dict.items(), key=lambda x: x[1], reverse=True)[:10]
         print('score_dict_sorted', score_dict_sorted)
-        return score_dict_sorted
+        return score_dict_sorted # score_dict_sorted [('one thousands and three hundreds', 0.4), ('one book', 0.2),....]
 
     def run(self, query) -> list:
         rankings: dict = self.rank_candidates(self.get_candidates(query))
+        #out = [item[0] for item in rankings]
+        #print('result',out)
+        #return out
         return [item[0] for item in rankings]
