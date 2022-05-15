@@ -11,6 +11,7 @@
 2. Set up basic backbone using <em>JQuery</em>
    scss (声明变量$)
    $ pip freeze > requirements.txt
-    
+
 3. build index
 
+4. ranking (freq_wd, tf, idf, score)
