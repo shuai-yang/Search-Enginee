@@ -4,16 +4,37 @@
         <link rel="stylesheet" type="text/css" href="{{ url_for('static',filename='styles.css') }}">
     </head>
 
-    <div class="search">
-        <input type="search" class="search-box" />
-        <span class="search-button">
-            <span class="search-icon"></span>
-        </span>
-    </div>
+    <form action="/search" method="GET">
+        <div class="search">
+            <input type="text" id="query" name="query" class="search-box" />
+            <span class="search-button">
+                <span class="search-icon"></span>
+            </span>
+        </div>
+    </form>
 
+    {% if results %}
+    <div class="results">
+        <ol>
+            {% for item in results %}
+            <li style='color: white; font-size: 14pt; font-family: monospace'>{{ item }}</li>
+            {% endfor %}
+        </ol>
+    </div>
+    {% endif %}
+    
     <script>
         $('.search-button').click(function () {
             $(this).parent().toggleClass('open');
-        });
+        })
     </script>
+
+    <script>
+        function search() {
+            query = $('.search-box').val();
+            console.log(query);
+            window.location.href = '/search?q=' + query;
+        }
+    </script>
+
 </html>
