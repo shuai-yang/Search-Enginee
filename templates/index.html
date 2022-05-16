@@ -6,15 +6,22 @@
 
     <form action="/search" method="GET">
         <div class="search">
-            <input type="text" id="query" name="query" class="search-box" />
+            <input type="text" id="q" name="q" class="search-box" />
             <span class="search-button">
                 <span class="search-icon"></span>
             </span>
         </div>
     </form>
 
+    <div class="suggestions-dropdown" style='color: rgb(44, 253, 222); font-size: 12pt; font-family: monospace'>
+        <span id="suggestions-title" style='color: white'>Suggestions</span>
+        <ol class="suggestions">
+        </ol>
+    </div>
+
     {% if results %}
-    <div class="results">
+    <div class="results" style='color: white; font-size: 14pt; font-family: monospace'> 
+        <span id="results-title">Results</span>
         <ol>
             {% for item in results %}
             <li style='color: white; font-size: 14pt; font-family: monospace'>{{ item }}</li>
@@ -25,6 +32,7 @@
     
     <script>
         $('.search-button').click(function () {
+            console.log('.search-button.click(function)')
             $(this).parent().toggleClass('open');
         })
     </script>
@@ -32,9 +40,35 @@
     <script>
         function search() {
             query = $('.search-box').val();
-            console.log(query);
+            console.log('.search-box val()', query)
             window.location.href = '/search?q=' + query;
         }
     </script>
+    
+    <script>
+        $('#suggestions-title') .hide();
+        $('.search-box').on('input', function (event) {
+            console.log('triggered event', event);
+            if (this.value.length == 0) {
+                $('.suggestions').empty()
+                return
+            }
+            else if (event.originalEvent.data == ' ') {
+                $('#suggestions-title').show();
+                $.ajax({
+                    url: "/suggestions?q=" + encodeURI(this.value), 
+                    success: function (result) {
+                        console.log('function(result)', result)
+                        $('.suggestions').empty()
 
+                        $.each(result, function (i, r) {
+                            console.log('i=', i, 'r=', r)
+                            $('.suggestions').append(`<li><a href="/search?q=${r}"` + ` style="color: white" class="list-group-item">${r}</a></li>`)
+                        });
+                    }
+                });
+            }
+        });
+    </script>
+    
 </html>

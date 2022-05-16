@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request
+from flask import Flask, render_template, request, jsonify
 from nltk.tokenize import word_tokenize
 from nltk.stem import WordNetLemmatizer
 from nltk.corpus import stopwords
@@ -8,6 +8,7 @@ from time import time
 # print(os.listdir("."))
 from collections import Counter # A counter is a container that stores elements as dictionary keys, and their counts are stored as dictionary values.
 import json
+from query_suggestions import QuerySuggestions
 app = Flask(__name__, static_url_path='/static') 
 
 lemmatizer = WordNetLemmatizer()
@@ -19,6 +20,14 @@ N = len(DOCUMENTS)
 #inv_index = {}
 TF = {} #Term Frequency
 IDF = {} #Inverse Document Frequency
+QUERY_LOGFILE = 'data/query_count.csv'
+QUERY_SUGGESTIONS = QuerySuggestions(QUERY_LOGFILE)
+#print(QUERY_SUGGESTIONS.query_log)
+#print(QUERY_SUGGESTIONS.query_log.items()) # dict_items([('a a', 6), ('a a a', 3),...])
+#print(QUERY_SUGGESTIONS.get_candidates('one').values()) # dict_values([3, 1])
+#print(QUERY_SUGGESTIONS.get_candidates('one').items()) 
+#QUERY_SUGGESTIONS.rank_candidates(QUERY_SUGGESTIONS.get_candidates('one'))
+#score_dict {'one book': 0.3, 'twenty one': 0.1, 'one thousands and one hundred': 0.2, 'one thousands and two hundreds': 0.1, 'one thousands and three hundreds': 0.3}
 
 def build_index():
     global TF, IDF
@@ -104,6 +113,7 @@ def search():
     rankings = []
     if request.args:
         query = request.args.get('q')
+        print('@app.route /search:', query)
 
         # perform search, get rankings, return most relevant result
         q_tokens = [lemmatizer.lemmatize(token) for token in word_tokenize(query.lower()) if token not in STOPWORDS]
@@ -116,10 +126,21 @@ def search():
                 print(TF.get(key), IDF.get(w), TF.get(key)*IDF.get(w), score)
             relevance_scores[d] = score
 
-        print(relevance_scores)
+        print('relevance_scores', relevance_scores)
         rankings = list(sorted(relevance_scores, key=relevance_scores.get, reverse=True)) # .get() value
 
-    return  render_template('index.html', results=rankings)
+    return render_template('index.html', results=rankings)
+
+@app.route('/suggestions', methods=['GET'])
+def suggestions():
+    if request.args:
+        query = request.args.get('q')
+        print('@app.route /suggestions:', query)
+        suggestions = QUERY_SUGGESTIONS.run(query)
+        #return suggestions # The view function return type a string, dict, tuple, Response instance, or WSGI callable, but it was a list.
+        #return jsonify(suggestions), 200 # jsonify() is Response instance
+
+        return render_template('index.html', results=suggestions)
 
 if __name__ == "__main__":
     build_index()

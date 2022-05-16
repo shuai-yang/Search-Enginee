@@ -15,3 +15,5 @@
 3. build index
 
 4. ranking (freq_wd, tf, idf, score)
+
+5. query suggestions
